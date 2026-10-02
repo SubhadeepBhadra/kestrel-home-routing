@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kestrel Home — Intelligent Service Request Router</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="logo-icon">🦅</div>
+        <div>
+          <h1>Kestrel Home <span class="brand-badge">Ops v4.1</span></h1>
+          <p class="subtitle">AI-Powered Service Request Routing & Triage Engine</p>
+        </div>
+      </div>
+      <div class="header-status">
+        <div class="status-indicator active">
+          <span class="pulse-dot"></span>
+          <span class="status-text">Production Model Online</span>
+        </div>
+        <div class="cost-metric-badge">
+          <span class="metric-label">Inference Cost</span>
+          <span class="metric-val">₹0.00 / call</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- Input Panel -->
+      <section class="card input-card">
+        <div class="card-header">
+          <h2>Inbound Service Request</h2>
+          <span class="card-desc">Simulate live customer intake across all 4 channels</span>
+        </div>
+
+        <!-- Quick Presets -->
+        <div class="presets-container">
+          <span class="presets-label">Test Scenarios:</span>
+          <div class="preset-buttons">
+            <button type="button" class="preset-btn" data-preset="repair_paid">⚡ Fault + Paid Trap</button>
+            <button type="button" class="preset-btn" data-preset="consumable">💧 Filter / Spare Part</button>
+            <button type="button" class="preset-btn" data-preset="true_billing">💳 Real Double Charge</button>
+            <button type="button" class="preset-btn" data-preset="install">🛠️ Wall Mount / Demo</button>
+            <button type="button" class="preset-btn" data-preset="return_damage">📦 Broken on Delivery</button>
+            <button type="button" class="preset-btn" data-preset="warranty">🛡️ Shield Registration</button>
+          </div>
+        </div>
+
+        <form id="routing-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="request_id">Request ID</label>
+              <input type="text" id="request_id" value="SR-LIVE-2026-09" placeholder="e.g. SR510999" required>
+            </div>
+
+            <div class="form-group">
+              <label for="channel">Intake Channel</label>
+              <select id="channel" required>
+                <option value="chat" selected>Chat (D2C Web/App)</option>
+                <option value="whatsapp">WhatsApp Business</option>
+                <option value="ivr">IVR Voice Transcript</option>
+                <option value="email">Email Support</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="product_family">Product Family</label>
+              <select id="product_family" required>
+                <option value="Water Purifier" selected>Water Purifier</option>
+                <option value="Air Fryer">Air Fryer</option>
+                <option value="Mixer Grinder">Mixer Grinder</option>
+                <option value="Induction Cooktop">Induction Cooktop</option>
+                <option value="Room Heater">Room Heater</option>
+                <option value="Ceiling Fan">Ceiling Fan</option>
+                <option value="Robot Vacuum">Robot Vacuum</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="warranty_status">Warranty Status</label>
+              <select id="warranty_status" required>
+                <option value="in_warranty" selected>In Warranty (Standard 12/24mo)</option>
+                <option value="shield">Kestrel Shield Extended</option>
+                <option value="out_of_warranty">Out of Warranty</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="request_text">Customer Message / Voice Transcript</label>
+            <textarea id="request_text" rows="4" placeholder="Enter customer inquiry or paste IVR transcript..." required>water purifier not turning on, making buzzing noise and burnt smell. paid by emi last week please send technician.</textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" id="submit-btn" class="btn-primary">
+              <span class="btn-icon">⚡</span>
+              <span class="btn-text">Route Request</span>
+            </button>
+            <button type="button" id="reset-btn" class="btn-secondary">Clear</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Output Panel -->
+      <section class="card result-card" id="result-container">
+        <div class="card-header">
+          <h2>Routing Decision & Evidence</h2>
+          <span class="card-desc" id="latency-tag">Ready</span>
+        </div>
+
+        <div id="loading-state" class="loading-state" style="display: none;">
+          <div class="spinner"></div>
+          <p>Analyzing customer intent and policy rules...</p>
+        </div>
+
+        <div id="decision-content" class="decision-content">
+          <!-- Main Decision Header -->
+          <div class="decision-hero">
+            <div class="team-badge-wrapper">
+              <span class="meta-label">Assigned Department Queue</span>
+              <div class="team-badge" id="predicted-team">Repairs</div>
+              <p class="team-desc" id="team-desc">Product faults, breakdowns, error codes, noise, leaks - technician repair visits.</p>
+            </div>
+            <div class="confidence-gauge">
+              <div class="gauge-ring">
+                <span class="gauge-value" id="confidence-val">94.8%</span>
+              </div>
+              <span class="gauge-label">Confidence Score</span>
+            </div>
+          </div>
+
+          <!-- Employee Reasoning Section -->
+          <div class="info-block">
+            <div class="info-title">
+              <span class="icon">💡</span>
+              <span>Employee Actionable Reasoning</span>
+            </div>
+            <p class="info-body" id="reasoning-text">
+              Routed to Repairs because of explicit operational breakdown keywords ("not turning on", "buzzing noise", "burnt smell"). Under Ops Policy §3, the customer's mention of "paid by emi" describes past payment history and does not constitute a billing dispute.
+            </p>
+          </div>
+
+          <!-- Policy Reference -->
+          <div class="info-block policy-block">
+            <div class="info-title">
+              <span class="icon">📜</span>
+              <span>Policy Compliance Clause</span>
+            </div>
+            <p class="info-body" id="policy-text">
+              Ops Policy §3: Operational breakdown or physical defect detected. Requires technician visit.
+            </p>
+          </div>
+
+          <!-- Probabilities breakdown -->
+          <div class="info-block">
+            <div class="info-title">
+              <span class="icon">📊</span>
+              <span>Multi-Class Probability Distribution</span>
+            </div>
+            <div class="prob-bars" id="prob-bars">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span>Kestrel Home Appliances — Service Routing v4.1</span>
+      </div>
+      <div class="footer-right">
+        <span>License Cost Saved: <strong>₹3,20,000 / yr</strong></span>
+        <span>•</span>
+        <span>Misroute Handling Cost Saved: <strong>₹3,75,000 / yr</strong></span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
