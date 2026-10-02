@@ -1,5 +1,7 @@
 import os
 import re
+import sys
+import argparse
 import joblib
 import numpy as np
 import pandas as pd
@@ -71,7 +73,6 @@ def generate_reasoning(text: str, product: str, warranty: str, channel: str, pre
     elif any(w in t for w in ['how to use', 'recipe', 'preset', 'wattage', 'power consumption', 'specs', 'query']):
         signals.append("Usage / Educational Advice Inquiry Detected")
 
-    # Reasoning string
     desc = TEAM_DESCRIPTIONS.get(predicted_team, "")
     policy = POLICY_RULES.get(predicted_team, "")
     
@@ -116,7 +117,6 @@ def route_service_request(req: RouteRequest):
         'warranty_status': req.warranty_status.lower()
     }])
     
-    # Predict
     if hasattr(pipeline, "predict_proba"):
         probs = pipeline.predict_proba(df)[0]
         classes = pipeline.classes_
@@ -144,7 +144,6 @@ def route_service_request(req: RouteRequest):
         latency_ms=latency
     )
 
-# Static UI routes
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 os.makedirs(static_dir, exist_ok=True)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
@@ -158,5 +157,10 @@ def get_ui():
 
 if __name__ == "__main__":
     import uvicorn
-    print("Starting Kestrel Home Service Router on http://127.0.0.1:8000 ...")
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    parser = argparse.ArgumentParser(description="Start Kestrel Home Service Router")
+    parser.add_argument("--host", type=str, default="127.0.0.1", help="Host IP address (default: 127.0.0.1)")
+    parser.add_argument("--port", type=int, default=8000, help="Port number (default: 8000)")
+    args = parser.parse_args()
+
+    print(f"Starting Kestrel Home Service Router on http://{args.host}:{args.port} ...")
+    uvicorn.run(app, host=args.host, port=args.port)
