@@ -72,38 +72,52 @@ Macro Average           0.8502      0.8377     0.8434      10,822
 
 ---
 
-## 4. Getting Started & Running Locally
+## 4. Getting Started & Running Instructions
 
 ### Prerequisites
-* Python 3.10+
-* pip
+* Python 3.10 or higher
+* pip package manager
 
-### Installation
+### Step 1: Clone Repository
 ```bash
-# Clone the repository
 git clone https://github.com/SubhadeepBhadra/kestrel-home-routing.git
 cd kestrel-home-routing
+```
 
-# Install dependencies
+### Step 2: Install Dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-### Running the Web Service & Dashboard
+### Step 3: Run the Application
+
+#### Option A: Standard Run (Default Port 8000)
 ```bash
 python app.py
 ```
 
-The service will start on **`http://127.0.0.1:8000`**.
-* **Interactive Web Dashboard:** Open `http://127.0.0.1:8000` in your browser.
-* **OpenAPI / Swagger Documentation:** Open `http://127.0.0.1:8000/docs`.
+#### Option B: Custom Port / Host
+If port 8000 is occupied by another process, you can specify any custom port:
+```bash
+python app.py --port 8080
+```
+
+#### Option C: Run via Uvicorn CLI
+```bash
+uvicorn app:app --host 127.0.0.1 --port 8000 --reload
+```
 
 ---
 
-## 5. API Usage
+## 5. Accessing the UI & API
 
-### Single Request Routing: `POST /api/route`
+Once the server is running:
+* **Interactive Web Dashboard:** Open **[http://127.0.0.1:8000](http://127.0.0.1:8000)** in your browser.
+* **Swagger API Documentation:** Open **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**.
 
-#### cURL Example
+### Testing via Command Line
+
+#### cURL (Bash / macOS / Linux)
 ```bash
 curl -X POST http://127.0.0.1:8000/api/route \
   -H "Content-Type: application/json" \
@@ -116,7 +130,18 @@ curl -X POST http://127.0.0.1:8000/api/route \
   }'
 ```
 
-#### JSON Response
+#### PowerShell (Windows)
+```powershell
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/route" -Method Post -ContentType "application/json" -Body '{
+    "request_id": "SR510999",
+    "channel": "chat",
+    "product_family": "Water Purifier",
+    "warranty_status": "in_warranty",
+    "request_text": "water purifier not turning on, making loud buzzing noise and burnt smell. paid by emi last week please send technician."
+}' | ConvertTo-Json -Depth 4
+```
+
+#### JSON Response Structure
 ```json
 {
   "request_id": "SR510999",
@@ -146,7 +171,7 @@ curl -X POST http://127.0.0.1:8000/api/route \
 
 ## 6. Training & Reproducibility
 
-If you have the data pack placed in the `data/` directory:
+To retrain the model from scratch on the dataset:
 ```bash
 python train.py --data_dir data --model_out model.joblib --pred_out predictions.csv
 ```
@@ -157,15 +182,15 @@ python train.py --data_dir data --model_out model.joblib --pred_out predictions.
 
 ```
 .
-├── app.py                  # Production FastAPI service with policy reasoning
+├── app.py                  # Production FastAPI service with policy reasoning layer
 ├── train.py                # Standalone training & cross-validation script
-├── model.joblib            # Trained calibrated classifier pipeline
+├── model.joblib            # Trained calibrated classifier pipeline artifact
 ├── predictions.csv         # Out-of-sample predictions for test_unlabelled.csv
 ├── requirements.txt        # Python package dependencies
 ├── README.md               # Architecture, setup & API documentation
 ├── evidence.md             # Empirical benchmarks, slice analysis & financial ROI
 ├── memo_to_ritu.md         # 1-page non-technical executive memo for Ritu Deshpande
-├── submission-form.md      # Comprehensive answers to review form questions
+├── submission-form.md      # Comprehensive review answers
 └── static/                 # Frontend dashboard assets
     ├── index.html          # Interactive triage dashboard
     ├── style.css           # Glassmorphic UI stylesheet
